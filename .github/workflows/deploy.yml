@@ -20,7 +20,15 @@ jobs:
         username: azureuser
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "."
-        target: "/home/azureuser/repo"  # Copy the entire repository to this directory on the VM
+        target: "/home/azureuser/repo"
+        port: 22
+        timeout: 30s
+        command_timeout: 10m
+        use_insecure_cipher: false
+        rm: false
+        debug: false
+        strip_components: 0
+        overwrite: false
 
     - name: Execute commands via SSH
       uses: appleboy/ssh-action@v0.1.6
