@@ -1,42 +1,22 @@
-name: Deploy to Azure VM
+name: Connect to Azure VM
 
 on:
   push:
     branches:
-      - main  # Change this to the branch you want to trigger the deploy
+      - main
 
 jobs:
-  deploy:
+  connect:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 102.37.221.106 >> ~/.ssh/known_hosts
 
-    - name: Copy repository via SSH
-      uses: appleboy/scp-action@v0.1.0
-      with:
-        host: 102.37.220.75
-        username: azureuser
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "."
-        target: "/home/azureuser/repo"
-        port: 22
-        timeout: 30s
-        command_timeout: 10m
-        use_insecure_cipher: false
-        rm: false
-        debug: false
-        strip_components: 0
-        overwrite: false
-
-    - name: Execute commands via SSH
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: 102.37.220.75
-        username: azureuser
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /home/azureuser/repo
-          docker-compose down
-          docker-compose up -d
+      - name: Connect to VM
+        run: |
+          ssh -i ~/.ssh/id_rsa azureuser@102.37.221.106 "echo 'Connected to Azure VM'"
