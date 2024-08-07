@@ -15,16 +15,20 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AZURE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 102.37.249.32 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 74.225.176.128 >> ~/.ssh/known_hosts
 
-      - name: Connect to VM and run docker-compose
+      - name: Connect to VM and manage repository
         run: |
-          ssh -i ~/.ssh/id_rsa azureuser@102.37.249.32 << 'EOF'
+          ssh -i ~/.ssh/id_rsa azureuser@74.225.176.128 << 'EOF'
             echo 'Connected to Azure VM'
-            # Create a directory for the repo
-            mkdir -p ~/repo
-            cd ~/repo
-            # Clone the repository
-            git clone https://github.com/BENZ199/compose_for_reactnodejsmysqlwithadminer.git .
-            
+            # Create a directory for the repo if it doesn't exist
+            REPO_DIR=~/repo
+            if [ ! -d "$REPO_DIR" ]; then
+              echo "Cloning the repository..."
+              git clone https://github.com/BENZ199/compose_for_reactnodejsmysqlwithadminer.git "$REPO_DIR"
+            else
+              echo "Repository already exists. Pulling the latest changes..."
+              cd "$REPO_DIR"
+              git pull origin main  # Change 'main' if your branch name is different
+            fi
           EOF
