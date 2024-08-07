@@ -19,7 +19,7 @@ jobs:
 
       - name: Connect to VM and manage repository
         run: |
-          ssh -i ~/.ssh/id_rsa azureuser@74.225.176.128 << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o HostKeyAlgorithms=+ssh-rsa testadmin@74.225.176.128 << 'EOF'
             echo 'Connected to Azure VM'
             # Create a directory for the repo if it doesn't exist
             REPO_DIR=~/repo
